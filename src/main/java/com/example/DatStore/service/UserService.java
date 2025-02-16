@@ -16,4 +16,5 @@ public interface UserService {
     void changePassword(Long id, ChangePasswordRequest request, UserDetails userDetails);
     void updateUser(Long id, UserDTO userDTO);
     Page<UserDTO> getAllUsers(FilterDTO filterDTO, Pageable pageable);
+    String deleteUser(Long id);
 }

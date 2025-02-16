@@ -1,11 +1,14 @@
 package com.example.DatStore.service.impl;
 
 import com.example.DatStore.dto.CategoryDTO;
+import com.example.DatStore.dto.FilterDTO;
 import com.example.DatStore.entity.Category;
 import com.example.DatStore.mapper.CategoryMapper;
 import com.example.DatStore.repository.CategoryRepository;
 import com.example.DatStore.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,9 +24,18 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryMapper categoryMapper;
 
     @Override
-    public List<CategoryDTO> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categoryMapper.toDto(categories);
+    public Page<CategoryDTO> getAllCategories(FilterDTO filterDTO, Pageable pageable) {
+        String field = filterDTO.getField();
+        String value = filterDTO.getValue();
+
+        if (value ==null)
+            return categoryRepository.findAll(pageable)
+                    .map(categoryMapper::toDto);
+
+        return switch (field) {
+            case "name" -> categoryRepository.findByNameContainingIgnoreCase(value, pageable).map(categoryMapper::toDto);
+            default -> throw new IllegalArgumentException("Field not correct");
+        };
     }
 
     @Override
@@ -37,16 +49,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category updateCategory(Long id, Category updatedCategory) {
-        return categoryRepository.findById(id).map(category -> {
-            category.setName(updatedCategory.getName());
-            category.setDescription(updatedCategory.getDescription());
-            return categoryRepository.save(category);
-        }).orElseThrow(() -> new RuntimeException("Category not found"));
+    public CategoryDTO updateCategory(Long id, CategoryDTO updatedCategory) {
+        return categoryRepository.findById(id)
+                .map(category -> {
+                    categoryMapper.updateCategoryFromDTO(updatedCategory, category);
+                    return categoryRepository.save(category);
+                })
+                .map(categoryMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
+
 
     @Override
     public void deleteCategory(Long id) {
+
         categoryRepository.deleteById(id);
     }
 }

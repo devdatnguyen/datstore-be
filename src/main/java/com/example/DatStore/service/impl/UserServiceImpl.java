@@ -5,6 +5,7 @@ import com.example.DatStore.dto.UserDTO;
 import com.example.DatStore.dto.FilterDTO;
 import com.example.DatStore.entity.Role;
 import com.example.DatStore.entity.User;
+import com.example.DatStore.exception.ResourceNotFoundException;
 import com.example.DatStore.mapper.UserMapper;
 import com.example.DatStore.repository.UserRepository;
 import com.example.DatStore.service.UserService;
@@ -82,6 +83,16 @@ public class UserServiceImpl implements UserService {
             default -> throw new IllegalArgumentException("Field not correct");
         };
 
+    }
+
+    @Override
+    public String deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found!");
+        }
+
+        userRepository.deleteById(id);
+        return "Deleted User!";
     }
 
     public void changePassword(Long id, ChangePasswordRequest request, UserDetails userDetails) {

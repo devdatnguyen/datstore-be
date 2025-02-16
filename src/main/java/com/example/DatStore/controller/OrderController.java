@@ -1,10 +1,12 @@
 package com.example.DatStore.controller;
 
+import com.example.DatStore.dto.FilterDTO;
 import com.example.DatStore.dto.OrderDTO;
 import com.example.DatStore.entity.Order;
 import com.example.DatStore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,11 +24,11 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<Page<OrderDTO>> getOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @ModelAttribute FilterDTO filter,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
 
-        Page<OrderDTO> orders = orderService.getOrders(userDetails, page, size);
+        Page<OrderDTO> orders = orderService.getOrders(userDetails, filter, pageable);
         return ResponseEntity.ok(orders);
     }
 

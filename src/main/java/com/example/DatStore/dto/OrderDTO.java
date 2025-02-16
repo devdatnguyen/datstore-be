@@ -17,6 +17,8 @@ import java.util.List;
 public class OrderDTO {
     private long id;
     private long userId;
+    private String userEmail;
+    private String username;
     private LocalDateTime orderDate = LocalDateTime.now();
     private OrderStatus status = OrderStatus.PROCESSING;
     private double totalPrice;

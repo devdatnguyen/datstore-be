@@ -1,9 +1,15 @@
 package com.example.DatStore.controller;
 
 import com.example.DatStore.dto.CategoryDTO;
+import com.example.DatStore.dto.FilterDTO;
 import com.example.DatStore.entity.Category;
+import com.example.DatStore.exception.ResourceNotFoundException;
+import com.example.DatStore.repository.CategoryRepository;
 import com.example.DatStore.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,10 +21,14 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @GetMapping
-    public List<CategoryDTO> getAllCategories() {
-        return categoryService.getAllCategories();
+    public ResponseEntity<Page<CategoryDTO>> getUsers(
+            FilterDTO filterDTO,
+            Pageable pageable) {
+        return ResponseEntity.ok(categoryService.getAllCategories(filterDTO, pageable));
     }
 
     @GetMapping("/{id}")
@@ -32,7 +42,10 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category updatedCategory) {
+    public CategoryDTO updateCategory(@PathVariable Long id, @RequestBody CategoryDTO updatedCategory) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category ID not found!");
+        }
         return categoryService.updateCategory(id, updatedCategory);
     }
 

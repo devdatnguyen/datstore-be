@@ -1,8 +1,10 @@
 package com.example.DatStore.service;
 
+import com.example.DatStore.dto.FilterDTO;
 import com.example.DatStore.dto.OrderDTO;
 import com.example.DatStore.entity.Order;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -13,5 +15,5 @@ public interface OrderService {
     Order createOrder(OrderDTO order);
     Order updateOrder(Long id, Order updatedOrder);
     void deleteOrder(Long id);
-    Page<OrderDTO> getOrders(UserDetails user, int page, int size);
+    Page<OrderDTO> getOrders(UserDetails user, FilterDTO filterDTO, Pageable pageable);
 }
